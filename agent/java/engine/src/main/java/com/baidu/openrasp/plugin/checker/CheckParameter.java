@@ -41,6 +41,7 @@ public class CheckParameter {
     public enum Type {
         // js插件检测
         SQL("sql", new V8AttackChecker(), 1),
+        SQLResult("sqlResult", new V8AttackChecker(), 1 << 27),
         COMMAND("command", new V8AttackChecker(), 1 << 1),
         DIRECTORY("directory", new V8AttackChecker(), 1 << 2),
         REQUEST("request", new V8AttackChecker(), 1 << 3),

@@ -115,6 +115,10 @@ public class CustomClassTransformer implements ClassFileTransformer {
         hooks.add(hook);
     }
 
+    /**
+     *   添加Hook点实现字节码的转换
+     *   @classesSet 扫描SCAN_ANNOTATION_PACKAGE（com.baidu.openrasp.hook）目录下，含有HookAnnotation注解的类
+     * */
     private void addAnnotationHook() {
         Set<Class> classesSet = AnnotationScanner.getClassWithAnnotation(SCAN_ANNOTATION_PACKAGE, HookAnnotation.class);
         for (Class clazz : classesSet) {

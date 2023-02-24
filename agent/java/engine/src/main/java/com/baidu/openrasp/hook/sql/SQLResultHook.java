@@ -18,6 +18,7 @@ package com.baidu.openrasp.hook.sql;
 
 import com.baidu.openrasp.HookHandler;
 import com.baidu.openrasp.plugin.checker.CheckParameter;
+import com.baidu.openrasp.tool.annotation.HookAnnotation;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.NotFoundException;
@@ -25,22 +26,17 @@ import javassist.NotFoundException;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
-import com.baidu.openrasp.tool.annotation.HookAnnotation;
-
 /**
- * Created by tyy on 17-11-6.
- * 为检测慢查询添加便利 sql 查询结果的 hook 点
+ * Created by ldx on 22-10-20.
+ * sql查询结果hook点
  */
 @HookAnnotation
-public class SQLResultSetHook extends AbstractSqlHook {
+public class SQLResultHook extends AbstractSqlHook {
 
-    /**
-     * (none-javadoc)
-     *
-     * @see com.baidu.openrasp.hook.AbstractClassHook#isClassMatched(String)
-     */
     @Override
     public boolean isClassMatched(String className) {
          /* MySQL */
@@ -95,20 +91,13 @@ public class SQLResultSetHook extends AbstractSqlHook {
         return false;
     }
 
-    /**
-     * (none-javadoc)
-     *
-     * @see com.baidu.openrasp.hook.AbstractClassHook#getType()
-     */
     @Override
     public String getType() {
-        return "sqlSlowQuery";
+        return "sqlResult";
     }
 
     /**
-     * (none-javadoc)
-     *
-     * @see com.baidu.openrasp.hook.AbstractClassHook#hookMethod(CtClass)
+     * hook 目标类的函数
      */
     @Override
     protected void hookMethod(CtClass ctClass) throws IOException, CannotCompileException, NotFoundException {
@@ -132,35 +121,36 @@ public class SQLResultSetHook extends AbstractSqlHook {
      * @param ctClass sql 检测结果类
      */
     private void hookSqlResultMethod(CtClass ctClass) throws NotFoundException, CannotCompileException {
-        String src = getInvokeStaticSrc(SQLResultSetHook.class, "checkSqlQueryResult",
+        String src = getInvokeStaticSrc(SQLResultHook.class, "checkSqlResult",
                 "\"" + type.name + "\"" + ",$0", String.class, Object.class);
         insertBefore(ctClass, "next", "()Z", src);
     }
 
     /**
-     * 检测数据库查询结果
+     * 获取数据库查询结果
      *
      * @param sqlResultSet 数据库查询结果
      */
-    public static void checkSqlQueryResult(String server, Object sqlResultSet) {
+    public static void checkSqlResult(String server, Object sqlResultSet) {
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             ResultSet resultSet = (ResultSet) sqlResultSet;
-            if (resultSet.isLast()) {
-                int queryCount = resultSet.getRow();
-                params.put("query_count", queryCount);
-                params.put("server", server);
-                int rows = resultSet.getMetaData().getColumnCount();
-                Map rowData = new HashMap();
-                for (int i = 1; i <= rows; i++) {
-                    rowData.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
-                }
-                params.put("result", rowData.toString());
+            int queryCount = resultSet.getRow();
+            params.put("query_count", queryCount);
+            params.put("server", server);
+
+            int rows = resultSet.getMetaData().getColumnCount();
+            Map rowData = new HashMap();
+            for (int i=1;i<=rows;i++){
+                rowData.put(resultSet.getMetaData().getColumnName(i),resultSet.getObject(i));
             }
+            params.put("result", rowData.toString());
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        HookHandler.doCheck(CheckParameter.Type.SQL_SLOW_QUERY, params);
+        HookHandler.doCheck(CheckParameter.Type.SQLResult, params);
     }
 
 }
