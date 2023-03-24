@@ -32,6 +32,7 @@ import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.log4j.helpers.LogLog;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -76,6 +77,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     @Override
     protected void hookMethod(CtClass ctClass) throws IOException, CannotCompileException, NotFoundException {
         if (this.resultType.equals("ResultScanner")) {
+            LogLog.debug("--------- in hbaseResultScanner Hook");
             CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
             ctClass.addField(field);
             String getScannerNextMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
@@ -83,6 +85,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
                     "\"" + type + "\"" + ",$0", String.class, Object.class);
             insertBefore(ctClass, "next", getScannerNextMethodDesc, getScannerSrc);
         }else if (this.resultType.equals("Result")){
+            LogLog.debug("--------- in hbaseResult Hook");
             String getMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
             String getSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlResult",
                     "\"" + type + "\"" + ",$_", String.class, Object.class);
@@ -94,6 +97,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     public static void checkSqlAllResult(String server, Object scannerResult) {
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
+            LogLog.debug("--------- in checkSqlAllResult,hookFirstRow= "+hookFirstRow);
             Result r = (Result) scannerResult;
             HashMap<String, String> results = new HashMap<String, String>();
             if (hookFirstRow == true) {
