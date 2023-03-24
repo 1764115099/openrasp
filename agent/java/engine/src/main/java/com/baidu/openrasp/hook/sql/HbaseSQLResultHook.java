@@ -53,7 +53,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 
     @Override
     public boolean isClassMatched(String className) {
-        if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
+        if ("org/apache/hadoop/hbase/client/ScannerCallable".equals(className)) {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
             this.resultType = "ResultScanner";
@@ -79,21 +79,19 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
             ctClass.addField(field);
             String getScannerNextMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
-            String getScannerSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlResult",
+            String getScannerSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlAllResult",
                     "\"" + type + "\"" + ",$0", String.class, Object.class);
             insertBefore(ctClass, "next", getScannerNextMethodDesc, getScannerSrc);
         }else if (this.resultType.equals("Result")){
             String getMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
             String getSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlResult",
-                    "\"" + type + "\"" + ",$0", String.class, Object.class);
-            insertBefore(ctClass, "next", getMethodDesc, getSrc);
+                    "\"" + type + "\"" + ",$_", String.class, Object.class);
+            insertBefore(ctClass, "get", getMethodDesc, getSrc);
         }
-
-
-
     }
-//    public static boolean hookFirstRow = true;
-    public static void checkSqlResult(String server, Object scannerResult) {
+
+    public static boolean hookFirstRow = true;
+    public static void checkSqlAllResult(String server, Object scannerResult) {
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             Result r = (Result) scannerResult;
@@ -113,6 +111,34 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 
                     results.put(qualifier, value);
                 }
+            }
+            params.put("server", server);
+            params.put("result", results);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
+    }
+
+    public static void checkSqlResult(String server, Object scannerResult) {
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        try {
+            Result r = (Result) scannerResult;
+            HashMap<String, String> results = new HashMap<String, String>();
+
+            List<Cell> cells = r.listCells();
+            // 遍历 KeyValue 实例
+            for (Cell cell : cells) {
+                // 获取列限定符
+                byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
+                String qualifier = Bytes.toString(qualifierBytes);
+
+                // 获取值
+                byte[] valueBytes = CellUtil.cloneValue(cell);
+                String value = Bytes.toString(valueBytes);
+
+                results.put(qualifier, value);
             }
             params.put("server", server);
             params.put("result", results);
