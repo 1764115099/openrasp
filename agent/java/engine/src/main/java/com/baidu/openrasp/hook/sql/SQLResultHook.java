@@ -46,11 +46,11 @@ public class SQLResultHook extends AbstractSqlHook {
 
     @Override
     public boolean isClassMatched(String className) {
-        LOGGER.info("===== hook class"+ className);
+        LOGGER.info("######### hook class: "+ className);
         if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
             this.type = SqlType.HBASE;
             this.exceptions = new String[]{"java/sql/SQLException"};
-            LOGGER.info("===== hook hbase"+ className);
+            LOGGER.info("===== hook hbase: "+ className);
             return true;
         }
          /* MySQL */
@@ -58,7 +58,7 @@ public class SQLResultHook extends AbstractSqlHook {
                 || "com/mysql/cj/jdbc/result/ResultSetImpl".equals(className)) {
             this.type = SqlType.MYSQL;
             this.exceptions = new String[]{"java/sql/SQLException"};
-            LOGGER.info("----- hook msyql"+ className);
+            LOGGER.info("----- hook msyql: "+ className);
             return true;
         }
 
@@ -129,6 +129,7 @@ public class SQLResultHook extends AbstractSqlHook {
             LOGGER.info("====== hook Hbase Method");
             hookHbaseMethod(ctClass);
         } else {
+            LOGGER.info("------ hook sql Method");
             hookSqlResultMethod(ctClass);
         }
     }
@@ -139,12 +140,13 @@ public class SQLResultHook extends AbstractSqlHook {
      * @param ctClass sql 检测结果类
      */
     private void hookSqlResultMethod(CtClass ctClass) throws NotFoundException, CannotCompileException {
+        LOGGER.info("--------- in hookSqlResultMethod Hook");
         String src = getInvokeStaticSrc(SQLResultHook.class, "checkSqlResult",
                 "\"" + type.name + "\"" + ",$0", String.class, Object.class);
         insertBefore(ctClass, "next", "()Z", src);
     }
     private void hookHbaseMethod(CtClass ctClass) throws NotFoundException, CannotCompileException {
-        LOGGER.info("--------- in hbaseResultScanner Hook");
+        LOGGER.info("--------- in hookHbaseMethod Hook");
         String getScannerNextMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
         String getScannerSrc = getInvokeStaticSrc(SQLResultHook.class, "checkHbaseResult",
                 "\"" + type + "\"" + ",$_", String.class, Object.class);
