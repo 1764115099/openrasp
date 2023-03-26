@@ -47,7 +47,7 @@ public class SQLResultHook extends AbstractSqlHook {
     @Override
     public boolean isClassMatched(String className) {
         LOGGER.info("######### hook class: "+ className);
-        if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
+        if ("org/apache/hadoop/hbase/client/HTable".equals(className)) {
             this.type = SqlType.HBASE;
             this.exceptions = new String[]{"java/sql/SQLException"};
             LOGGER.info("===== hook hbase: "+ className);
