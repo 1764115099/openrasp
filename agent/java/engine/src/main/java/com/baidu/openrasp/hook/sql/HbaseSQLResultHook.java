@@ -58,13 +58,13 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
             this.resultType = "ResultScanner";
+            LOGGER.info("----------- hook ResultScanner");
             return true;
-        }
-
-        if ("org/apache/hadoop/hbase/client/Table".equals(className)) {
+        }else if ("org/apache/hadoop/hbase/client/HTable".equals(className)) {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
             this.resultType = "Result";
+            LOGGER.info("----------- hook Htable");
             return true;
         }
 
