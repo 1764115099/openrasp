@@ -51,12 +51,12 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 
     @Override
     public boolean isClassMatched(String className) {
-//        if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
-//            this.type = SQL_TYPE_HBASE;
-//            this.className = className;
-//            this.resultType = "ResultScanner";
-//            return true;
-//        }
+        if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
+            this.type = SQL_TYPE_HBASE;
+            this.className = className;
+            this.resultType = "ResultScanner";
+            return true;
+        }
 
         if ("org/apache/hadoop/hbase/client/Table".equals(className)) {
             this.type = SQL_TYPE_HBASE;
@@ -77,8 +77,8 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     protected void hookMethod(CtClass ctClass) throws IOException, CannotCompileException, NotFoundException {
         if (this.resultType.equals("ResultScanner")) {
 //            LogLog.debug("--------- in hbaseResultScanner Hook");
-            CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
-            ctClass.addField(field);
+//            CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
+//            ctClass.addField(field);
 
 //            CtMethod iteratorMethod = ctClass.getDeclaredMethod("iterator");
 //            CtMethod nextMethod = iteratorMethod.getReturnType().getDeclaredMethod("next");
