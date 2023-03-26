@@ -46,13 +46,13 @@ public class SQLResultHook extends AbstractSqlHook {
 
     @Override
     public boolean isClassMatched(String className) {
-        LOGGER.info("######### hook class: "+ className);
-        if ("org/apache/hadoop/hbase/client/HTable".equals(className)) {
-            this.type = SqlType.HBASE;
-            this.exceptions = new String[]{"java/sql/SQLException"};
-            LOGGER.info("===== hook hbase: "+ className);
-            return true;
-        }
+//        LOGGER.info("######### hook class: "+ className);
+//        if ("org/apache/hadoop/hbase/client/HTable".equals(className)) {
+//            this.type = SqlType.HBASE;
+//            this.exceptions = new String[]{"java/sql/SQLException"};
+//            LOGGER.info("===== hook hbase: "+ className);
+//            return true;
+//        }
          /* MySQL */
         if ("com/mysql/jdbc/ResultSetImpl".equals(className)
                 || "com/mysql/cj/jdbc/result/ResultSetImpl".equals(className)) {
@@ -125,10 +125,12 @@ public class SQLResultHook extends AbstractSqlHook {
                     }
                 }
             }
-        } else if (this.type.equals(SqlType.HBASE)) {
-            LOGGER.info("====== hook Hbase Method");
-            hookHbaseMethod(ctClass);
-        } else {
+        }
+//       else if (this.type.equals(SqlType.HBASE)) {
+//            LOGGER.info("====== hook Hbase Method");
+//            hookHbaseMethod(ctClass);
+//        }
+       else {
             LOGGER.info("------ hook sql Method");
             hookSqlResultMethod(ctClass);
         }

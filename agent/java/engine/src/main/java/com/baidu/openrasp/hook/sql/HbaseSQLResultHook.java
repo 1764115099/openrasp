@@ -43,7 +43,7 @@ import java.util.List;
  * @author: ldx
  * @create: 2023/03/16 14:21
  */
-//@HookAnnotation
+@HookAnnotation
 public class HbaseSQLResultHook extends AbstractClassHook {
     private static final Logger LOGGER = Logger.getLogger(HbaseSQLResultHook.class.getName());
     private static final String SQL_TYPE_HBASE = "hbase";
@@ -53,6 +53,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 
     @Override
     public boolean isClassMatched(String className) {
+        LOGGER.info("######### hook class: "+ className);
         if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
@@ -91,7 +92,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
                     "\"" + type + "\"" + ",$_", String.class, Object.class);
             insertBefore(ctClass, "next", getScannerNextMethodDesc, getScannerSrc);
         }else if (this.resultType.equals("Result")){
-//            LogLog.debug("--------- in hbaseResult Hook");
+            LogLog.debug("--------- in hbaseResult Hook");
             String getMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
             String getSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlResult",
                     "\"" + type + "\"" + ",$_", String.class, Object.class);
@@ -132,7 +133,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 //    }
 
     public static void checkSqlResult(String server, Object scannerResult) {
-        LOGGER.info("--------------in checkSqlResult,server= "+server+"scannerResult: "+scannerResult);
+        LOGGER.info("--------------in HbaseSQLResultHook checkSqlResult,server= "+server+"scannerResult: "+scannerResult);
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             Result r = (Result) scannerResult;
@@ -158,7 +159,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             e.printStackTrace();
         }
 
-//        HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
+        HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
     }
 
 
