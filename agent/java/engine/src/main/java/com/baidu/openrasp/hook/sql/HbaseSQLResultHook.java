@@ -51,15 +51,17 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 
     @Override
     public boolean isClassMatched(String className) {
+        if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
+            this.type = SQL_TYPE_HBASE;
+            this.className = className;
+            this.resultType = "ResultScanner";
+            return true;
+        }
+
         if ("org/apache/hadoop/hbase/client/Table".equals(className)) {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
             this.resultType = "Result";
-            return true;
-        }else if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
-            this.type = SQL_TYPE_HBASE;
-            this.className = className;
-            this.resultType = "ResultScanner";
             return true;
         }
 
