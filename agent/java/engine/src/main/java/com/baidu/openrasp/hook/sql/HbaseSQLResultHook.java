@@ -43,7 +43,7 @@ import java.util.List;
  * @author: ldx
  * @create: 2023/03/16 14:21
  */
-@HookAnnotation
+//@HookAnnotation
 public class HbaseSQLResultHook extends AbstractClassHook {
     private static final Logger LOGGER = Logger.getLogger(HbaseSQLResultHook.class.getName());
     private static final String SQL_TYPE_HBASE = "hbase";
@@ -79,8 +79,8 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     protected void hookMethod(CtClass ctClass) throws IOException, CannotCompileException, NotFoundException {
         if (this.resultType.equals("ResultScanner")) {
             LOGGER.debug("--------- in hbaseResultScanner Hook");
-            CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
-            ctClass.addField(field);
+//            CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
+//            ctClass.addField(field);
 
 //            CtMethod iteratorMethod = ctClass.getDeclaredMethod("iterator");
 //            CtMethod nextMethod = iteratorMethod.getReturnType().getDeclaredMethod("next");
