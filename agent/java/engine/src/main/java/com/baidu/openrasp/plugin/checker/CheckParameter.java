@@ -43,6 +43,7 @@ public class CheckParameter {
         SQL("sql", new V8AttackChecker(), 1),
         SQLResult("sqlResult", new V8AttackChecker(), 1 << 27),
         HbaseSQLResult("hbaseSqlResult", new V8AttackChecker(), 1 << 28),
+        SQL_SLOW_QUERY("sqlSlowQuery", new V8AttackChecker(), 1 << 29),
         COMMAND("command", new V8AttackChecker(), 1 << 1),
         DIRECTORY("directory", new V8AttackChecker(), 1 << 2),
         REQUEST("request", new V8AttackChecker(), 1 << 3),
@@ -70,7 +71,7 @@ public class CheckParameter {
 
         // java本地检测
         XSS_USERINPUT("xss_userinput", new XssChecker(), 1 << 16),
-        SQL_SLOW_QUERY("sqlSlowQuery", new SqlResultChecker(false), 0),
+//        SQL_SLOW_QUERY("sqlSlowQuery", new SqlResultChecker(false), 0),
 
         // 安全基线检测
         POLICY_LOG("log", new LogChecker(false), 1 << 22),

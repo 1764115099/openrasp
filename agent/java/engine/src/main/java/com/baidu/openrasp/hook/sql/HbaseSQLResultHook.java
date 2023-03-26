@@ -29,6 +29,7 @@ import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.LogLog;
 
 import java.io.IOException;
@@ -44,6 +45,7 @@ import java.util.List;
  */
 @HookAnnotation
 public class HbaseSQLResultHook extends AbstractClassHook {
+    private static final Logger LOGGER = Logger.getLogger(HbaseSQLResultHook.class.getName());
     private static final String SQL_TYPE_HBASE = "hbase";
     private String className;
     private String type;
@@ -76,7 +78,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     @Override
     protected void hookMethod(CtClass ctClass) throws IOException, CannotCompileException, NotFoundException {
         if (this.resultType.equals("ResultScanner")) {
-//            LogLog.debug("--------- in hbaseResultScanner Hook");
+            LOGGER.debug("--------- in hbaseResultScanner Hook");
 //            CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
 //            ctClass.addField(field);
 
@@ -97,43 +99,44 @@ public class HbaseSQLResultHook extends AbstractClassHook {
         }
     }
 
-    public static boolean hookFirstRow = true;
-    public static void checkSqlAllResult(String server, Object scannerResult) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
-        try {
-            LogLog.debug("--------- in checkSqlAllResult,hookFirstRow= "+hookFirstRow);
-            Result r = (Result) scannerResult;
-            HashMap<String, String> results = new HashMap<String, String>();
-            if (hookFirstRow == true) {
-                hookFirstRow = false;
-                List<Cell> cells = r.listCells();
-                // 遍历 KeyValue 实例
-                for (Cell cell : cells) {
-                    // 获取列限定符
-                    byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
-                    String qualifier = Bytes.toString(qualifierBytes);
-
-                    // 获取值
-                    byte[] valueBytes = CellUtil.cloneValue(cell);
-                    String value = Bytes.toString(valueBytes);
-
-                    results.put(qualifier, value);
-                }
-            }
-            params.put("server", server);
-            params.put("result", results);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
-    }
+//    public static boolean hookFirstRow = true;
+//    public static void checkSqlAllResult(String server, Object scannerResult) {
+//        HashMap<String, Object> params = new HashMap<String, Object>();
+//        try {
+//            LogLog.debug("--------- in checkSqlAllResult,hookFirstRow= "+hookFirstRow);
+//            Result r = (Result) scannerResult;
+//            HashMap<String, String> results = new HashMap<String, String>();
+//            if (hookFirstRow == true) {
+//                hookFirstRow = false;
+//                List<Cell> cells = r.listCells();
+//                // 遍历 KeyValue 实例
+//                for (Cell cell : cells) {
+//                    // 获取列限定符
+//                    byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
+//                    String qualifier = Bytes.toString(qualifierBytes);
+//
+//                    // 获取值
+//                    byte[] valueBytes = CellUtil.cloneValue(cell);
+//                    String value = Bytes.toString(valueBytes);
+//
+//                    results.put(qualifier, value);
+//                }
+//            }
+//            params.put("server", server);
+//            params.put("result", results);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
+//    }
 
     public static void checkSqlResult(String server, Object scannerResult) {
+        LOGGER.info("--------------in checkSqlResult,server= "+server+"scannerResult: "+scannerResult);
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             Result r = (Result) scannerResult;
-            HashMap<String, String> results = new HashMap<String, String>();
+            HashMap<String, String> result = new HashMap<String, String>();
 
             List<Cell> cells = r.listCells();
             // 遍历 KeyValue 实例
@@ -146,10 +149,11 @@ public class HbaseSQLResultHook extends AbstractClassHook {
                 byte[] valueBytes = CellUtil.cloneValue(cell);
                 String value = Bytes.toString(valueBytes);
 
-                results.put(qualifier, value);
+                result.put(qualifier, value);
             }
             params.put("server", server);
-            params.put("result", results);
+            params.put("result", result);
+            LOGGER.info("----------in checkSqlResult,result: "+result);
         } catch (Exception e) {
             e.printStackTrace();
         }
