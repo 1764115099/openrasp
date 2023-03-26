@@ -79,8 +79,8 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     protected void hookMethod(CtClass ctClass) throws IOException, CannotCompileException, NotFoundException {
         if (this.resultType.equals("ResultScanner")) {
             LOGGER.debug("--------- in hbaseResultScanner Hook");
-//            CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
-//            ctClass.addField(field);
+            CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
+            ctClass.addField(field);
 
 //            CtMethod iteratorMethod = ctClass.getDeclaredMethod("iterator");
 //            CtMethod nextMethod = iteratorMethod.getReturnType().getDeclaredMethod("next");

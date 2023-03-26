@@ -22,6 +22,7 @@ import com.baidu.openrasp.tool.annotation.HookAnnotation;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.NotFoundException;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -36,6 +37,7 @@ import java.util.Map;
  */
 @HookAnnotation
 public class SQLResultHook extends AbstractSqlHook {
+    private static final Logger LOGGER = Logger.getLogger(SQLResultHook.class.getName());
 
     @Override
     public boolean isClassMatched(String className) {
@@ -145,6 +147,7 @@ public class SQLResultHook extends AbstractSqlHook {
                 rowData.put(resultSet.getMetaData().getColumnName(i),resultSet.getObject(i));
             }
             params.put("result", rowData.toString());
+            LOGGER.info("----------in checkSqlResult,result: "+rowData.toString());
 
 
         } catch (Exception e) {
