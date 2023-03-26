@@ -21,7 +21,12 @@ import com.baidu.openrasp.plugin.checker.CheckParameter;
 import com.baidu.openrasp.tool.annotation.HookAnnotation;
 import javassist.CannotCompileException;
 import javassist.CtClass;
+import javassist.CtField;
 import javassist.NotFoundException;
+import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -41,6 +46,11 @@ public class SQLResultHook extends AbstractSqlHook {
 
     @Override
     public boolean isClassMatched(String className) {
+        if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
+            this.type = SqlType.HBASE;
+            this.exceptions = new String[]{"java/sql/SQLException"};
+            return true;
+        }
          /* MySQL */
         if ("com/mysql/jdbc/ResultSetImpl".equals(className)
                 || "com/mysql/cj/jdbc/result/ResultSetImpl".equals(className)) {
@@ -112,6 +122,8 @@ public class SQLResultHook extends AbstractSqlHook {
                     }
                 }
             }
+        } else if (this.type.equals(SqlType.HBASE)) {
+            hookHbaseMethod(ctClass);
         } else {
             hookSqlResultMethod(ctClass);
         }
@@ -126,6 +138,13 @@ public class SQLResultHook extends AbstractSqlHook {
         String src = getInvokeStaticSrc(SQLResultHook.class, "checkSqlResult",
                 "\"" + type.name + "\"" + ",$0", String.class, Object.class);
         insertBefore(ctClass, "next", "()Z", src);
+    }
+    private void hookHbaseMethod(CtClass ctClass) throws NotFoundException, CannotCompileException {
+        LOGGER.debug("--------- in hbaseResultScanner Hook");
+        String getScannerNextMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
+        String getScannerSrc = getInvokeStaticSrc(SQLResultHook.class, "checkHbaseResult",
+                "\"" + type + "\"" + ",$_", String.class, Object.class);
+        insertBefore(ctClass, "next", getScannerNextMethodDesc, getScannerSrc);
     }
 
     /**
@@ -147,13 +166,43 @@ public class SQLResultHook extends AbstractSqlHook {
                 rowData.put(resultSet.getMetaData().getColumnName(i),resultSet.getObject(i));
             }
             params.put("result", rowData.toString());
-            LOGGER.info("----------in checkSqlResult,result: "+rowData.toString());
+            LOGGER.info("----------in SQLResultHook checkSqlResult,result: "+rowData.toString());
 
 
         } catch (Exception e) {
             e.printStackTrace();
         }
         HookHandler.doCheck(CheckParameter.Type.SQLResult, params);
+    }
+
+    public static void checkHbaseResult(String server, Object scannerResult) {
+        LOGGER.info("--------------in checkHbaseResult,server= "+server+"scannerResult: "+scannerResult);
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        try {
+            Result r = (Result) scannerResult;
+            HashMap<String, String> result = new HashMap<String, String>();
+
+            List<Cell> cells = r.listCells();
+            // 遍历 KeyValue 实例
+            for (Cell cell : cells) {
+                // 获取列限定符
+                byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
+                String qualifier = Bytes.toString(qualifierBytes);
+
+                // 获取值
+                byte[] valueBytes = CellUtil.cloneValue(cell);
+                String value = Bytes.toString(valueBytes);
+
+                result.put(qualifier, value);
+            }
+            params.put("server", server);
+            params.put("result", result);
+            LOGGER.info("----------in checkHbaseResult,result: "+result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
     }
 
 }
