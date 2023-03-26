@@ -158,7 +158,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             e.printStackTrace();
         }
 
-        HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
+//        HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
     }
 
 
