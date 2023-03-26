@@ -23,10 +23,7 @@ import com.baidu.openrasp.plugin.checker.CheckParameter;
 import com.baidu.openrasp.tool.Reflection;
 import com.baidu.openrasp.tool.annotation.HookAnnotation;
 import com.google.gson.Gson;
-import javassist.CannotCompileException;
-import javassist.CtClass;
-import javassist.CtField;
-import javassist.NotFoundException;
+import javassist.*;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
@@ -54,18 +51,18 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 
     @Override
     public boolean isClassMatched(String className) {
-        if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
-            this.type = SQL_TYPE_HBASE;
-            this.className = className;
-            this.resultType = "ResultScanner";
-            return true;
-        }
         if ("org/apache/hadoop/hbase/client/Table".equals(className)) {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
             this.resultType = "Result";
             return true;
+        }else if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
+            this.type = SQL_TYPE_HBASE;
+            this.className = className;
+            this.resultType = "ResultScanner";
+            return true;
         }
+
         return false;
     }
 
@@ -77,19 +74,24 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     @Override
     protected void hookMethod(CtClass ctClass) throws IOException, CannotCompileException, NotFoundException {
         if (this.resultType.equals("ResultScanner")) {
-            LogLog.debug("--------- in hbaseResultScanner Hook");
-            CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
-            ctClass.addField(field);
+//            LogLog.debug("--------- in hbaseResultScanner Hook");
+//            CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
+//            ctClass.addField(field);
+
+//            CtMethod iteratorMethod = ctClass.getDeclaredMethod("iterator");
+//            CtMethod nextMethod = iteratorMethod.getReturnType().getDeclaredMethod("next");
+
+
             String getScannerNextMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
-            String getScannerSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlAllResult",
-                    "\"" + type + "\"" + ",$0", String.class, Object.class);
-            insertBefore(ctClass, "next", getScannerNextMethodDesc, getScannerSrc);
+            String getScannerSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlResult",
+                    "\"" + type + "\"" + ",$_", String.class, Object.class);
+            insertAfter(ctClass, "next", getScannerNextMethodDesc, getScannerSrc);
         }else if (this.resultType.equals("Result")){
-            LogLog.debug("--------- in hbaseResult Hook");
+//            LogLog.debug("--------- in hbaseResult Hook");
             String getMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
             String getSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlResult",
                     "\"" + type + "\"" + ",$_", String.class, Object.class);
-            insertBefore(ctClass, "get", getMethodDesc, getSrc);
+            insertAfter(ctClass, "get", getMethodDesc, getSrc);
         }
     }
 
