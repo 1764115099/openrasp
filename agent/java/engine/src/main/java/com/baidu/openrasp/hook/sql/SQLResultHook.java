@@ -46,9 +46,11 @@ public class SQLResultHook extends AbstractSqlHook {
 
     @Override
     public boolean isClassMatched(String className) {
+        LOGGER.info("===== hook class"+ className);
         if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
             this.type = SqlType.HBASE;
             this.exceptions = new String[]{"java/sql/SQLException"};
+            LOGGER.info("===== hook hbase"+ className);
             return true;
         }
          /* MySQL */
@@ -56,6 +58,7 @@ public class SQLResultHook extends AbstractSqlHook {
                 || "com/mysql/cj/jdbc/result/ResultSetImpl".equals(className)) {
             this.type = SqlType.MYSQL;
             this.exceptions = new String[]{"java/sql/SQLException"};
+            LOGGER.info("----- hook msyql"+ className);
             return true;
         }
 
@@ -123,6 +126,7 @@ public class SQLResultHook extends AbstractSqlHook {
                 }
             }
         } else if (this.type.equals(SqlType.HBASE)) {
+            LOGGER.info("====== hook Hbase Method");
             hookHbaseMethod(ctClass);
         } else {
             hookSqlResultMethod(ctClass);
@@ -140,7 +144,7 @@ public class SQLResultHook extends AbstractSqlHook {
         insertBefore(ctClass, "next", "()Z", src);
     }
     private void hookHbaseMethod(CtClass ctClass) throws NotFoundException, CannotCompileException {
-        LOGGER.debug("--------- in hbaseResultScanner Hook");
+        LOGGER.info("--------- in hbaseResultScanner Hook");
         String getScannerNextMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
         String getScannerSrc = getInvokeStaticSrc(SQLResultHook.class, "checkHbaseResult",
                 "\"" + type + "\"" + ",$_", String.class, Object.class);
