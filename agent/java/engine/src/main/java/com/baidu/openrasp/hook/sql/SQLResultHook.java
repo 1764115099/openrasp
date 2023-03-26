@@ -47,7 +47,7 @@ public class SQLResultHook extends AbstractSqlHook {
     @Override
     public boolean isClassMatched(String className) {
         LOGGER.info("######### hook class: "+ className);
-        if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
+        if ("org/apache/hadoop/hbase/client/Table".equals(className)) {
             this.type = SqlType.HBASE;
             this.exceptions = new String[]{"java/sql/SQLException"};
             LOGGER.info("===== hook hbase: "+ className);
@@ -147,10 +147,15 @@ public class SQLResultHook extends AbstractSqlHook {
     }
     private void hookHbaseMethod(CtClass ctClass) throws NotFoundException, CannotCompileException {
         LOGGER.info("--------- in hookHbaseMethod Hook");
-        String getScannerNextMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
-        String getScannerSrc = getInvokeStaticSrc(SQLResultHook.class, "checkHbaseResult",
+//        String getScannerNextMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
+//        String getScannerSrc = getInvokeStaticSrc(SQLResultHook.class, "checkHbaseResult",
+//                "\"" + type + "\"" + ",$_", String.class, Object.class);
+//        insertBefore(ctClass, "next", getScannerNextMethodDesc, getScannerSrc);
+
+        String getMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
+        String getSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkHbaseResult",
                 "\"" + type + "\"" + ",$_", String.class, Object.class);
-        insertBefore(ctClass, "next", getScannerNextMethodDesc, getScannerSrc);
+        insertAfter(ctClass, "get", getMethodDesc, getSrc);
     }
 
     /**
