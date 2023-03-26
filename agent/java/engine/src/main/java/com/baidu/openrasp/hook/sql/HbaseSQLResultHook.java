@@ -51,12 +51,12 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 
     @Override
     public boolean isClassMatched(String className) {
-        if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
-            this.type = SQL_TYPE_HBASE;
-            this.className = className;
-            this.resultType = "ResultScanner";
-            return true;
-        }
+//        if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
+//            this.type = SQL_TYPE_HBASE;
+//            this.className = className;
+//            this.resultType = "ResultScanner";
+//            return true;
+//        }
 
         if ("org/apache/hadoop/hbase/client/Table".equals(className)) {
             this.type = SQL_TYPE_HBASE;
@@ -87,7 +87,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             String getScannerNextMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
             String getScannerSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlResult",
                     "\"" + type + "\"" + ",$_", String.class, Object.class);
-            insertAfter(ctClass, "next", getScannerNextMethodDesc, getScannerSrc);
+            insertBefore(ctClass, "next", getScannerNextMethodDesc, getScannerSrc);
         }else if (this.resultType.equals("Result")){
 //            LogLog.debug("--------- in hbaseResult Hook");
             String getMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
