@@ -51,10 +51,15 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     private String type;
     private String resultType;
 
+    /**
+     * (none-javadoc)
+     *
+     * @see com.baidu.openrasp.hook.AbstractClassHook#isClassMatched(String)
+     */
     @Override
     public boolean isClassMatched(String className) {
         LOGGER.info("######### hook class: "+ className);
-        if ("org/apache/hadoop/hbase/client/Result".equals(className)) {
+        if ("org/apache/hadoop/hbase/client/ResultScanner".equals(className)) {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
             this.resultType = "ResultScanner";
@@ -80,9 +85,11 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     @Override
     protected void hookMethod(CtClass ctClass) throws IOException, CannotCompileException, NotFoundException {
         if (this.resultType.equals("ResultScanner")) {
-            LOGGER.debug("--------- in hbaseResultScanner Hook");
-//            CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
-//            ctClass.addField(field);
+            LOGGER.info("--------- in hbaseResultScanner Hook");
+            LOGGER.info("--------- in hbaseResultScanner hookMethod,ctClass1= "+ctClass);
+            CtField field = CtField.make("public static boolean hookFirstRow = true;", ctClass);
+            ctClass.addField(field);
+            LOGGER.info("--------- in hbaseResultScanner hookMethod,ctClass2= "+ctClass);
 
 //            CtMethod iteratorMethod = ctClass.getDeclaredMethod("iterator");
 //            CtMethod nextMethod = iteratorMethod.getReturnType().getDeclaredMethod("next");
