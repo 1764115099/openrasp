@@ -97,7 +97,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 
             String getScannerLastResultCacheMethodDesc = "([Lorg/apache/hadoop/hbase/client/Result;Z)[Lorg/apache/hadoop/hbase/client/Result;";
             String getScannerSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "getSqlResult",
-                    "\"" + type + "\"" + ",$1", String.class, Object.class);
+                    "\"" + type + "\"" + ",$0,$1", String.class, Object.class, Object.class);
             insertAfter(ctClass, "addAndGet", getScannerLastResultCacheMethodDesc, getScannerSrc);
 
 //            String getScannerNextMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
@@ -144,15 +144,17 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 //
 //        HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
 //    }
-    public static void getSqlResult(String server,Object results) {
+    public static void getSqlResult(String server, Object cs, Object results) {
         LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,server= "+server);
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             Result[] rs = (Result[]) results;
             params.put("server", server);
             params.put("result", rs[0].toString());
-            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result0= "+results);
-            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result1= "+rs);
+            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,class0= "+cs);
+            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,class1= "+cs.toString());
+            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result0= "+results.toString());
+            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result1= "+rs.toString());
             LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result2= "+rs.toString());
             LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result3= "+rs[0]);
             LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result4= "+rs[0].toString());
