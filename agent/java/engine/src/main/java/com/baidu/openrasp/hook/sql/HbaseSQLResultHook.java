@@ -97,7 +97,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 
             String getScannerLastResultCacheMethodDesc = "([Lorg/apache/hadoop/hbase/client/Result;Z)[Lorg/apache/hadoop/hbase/client/Result;";
             String getScannerSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "getSqlResult",
-                    "\"" + type + "\"" + ",$_", String.class, Object.class);
+                    "\"" + type + "\"" + ",$0", String.class, Object.class);
             insertAfter(ctClass, "addAndGet", getScannerLastResultCacheMethodDesc, getScannerSrc);
 
 //            String getScannerNextMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
