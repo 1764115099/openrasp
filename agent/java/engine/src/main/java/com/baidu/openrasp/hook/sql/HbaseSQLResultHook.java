@@ -151,7 +151,11 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             Result[] rs = (Result[]) results;
             params.put("server", server);
             params.put("result", rs[0].toString());
-
+            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result0= "+results);
+            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result1= "+rs);
+            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result2= "+rs.toString());
+            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result3= "+rs[0]);
+            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,result4= "+rs[0].toString());
         }catch (Exception e){
             e.printStackTrace();
         }
