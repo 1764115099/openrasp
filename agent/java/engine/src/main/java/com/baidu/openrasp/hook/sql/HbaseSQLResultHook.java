@@ -59,11 +59,11 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     @Override
     public boolean isClassMatched(String className) {
         LOGGER.info("######### hook class: "+ className);
-        if ("org/apache/hadoop/hbase/client/Table".equals(className)) {
+        if ("org/apache/hadoop/hbase/client/HTable".equals(className)) {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
             this.resultType = "Result";
-            LOGGER.info("----------- hook Table");
+            LOGGER.info("----------- hook HTable");
             return true;
         }
 
@@ -118,7 +118,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 
         }else if (this.resultType.equals("Result")){
             LogLog.debug("--------- in hbaseResult Hook");
-            String getMethodDesc = "()Lorg/apache/hadoop/hbase/client/Result;";
+            String getMethodDesc = "(Lorg/apache/hadoop/hbase/client/Get;)Lorg/apache/hadoop/hbase/client/Result;";
             String getSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlResult",
                     "\"" + type + "\"" + ",$_", String.class, Object.class);
             insertAfter(ctClass, "get", getMethodDesc, getSrc);
