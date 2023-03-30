@@ -138,14 +138,14 @@ public class SQLResultHook extends AbstractSqlHook {
         try {
             ResultSet resultSet = (ResultSet) sqlResultSet;
             int queryCount = resultSet.getRow();
-            params.put("query_count", queryCount);
+            params.put("querycount", queryCount);
             params.put("server", server);
             int rows = resultSet.getMetaData().getColumnCount();
             HashMap<String, Object> rowData = new HashMap<String, Object>();
             for (int i=1;i<=rows;i++){
                 rowData.put(resultSet.getMetaData().getColumnName(i),resultSet.getObject(i));
             }
-            params.put("sql_result", rowData.toString());
+            params.put("sqlresult", rowData.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
