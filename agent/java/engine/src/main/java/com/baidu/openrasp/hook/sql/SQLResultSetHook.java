@@ -25,15 +25,11 @@ import javassist.NotFoundException;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.HashMap;
-import java.util.Map;
-
-import com.baidu.openrasp.tool.annotation.HookAnnotation;
 
 /**
  * Created by tyy on 17-11-6.
  * 为检测慢查询添加便利 sql 查询结果的 hook 点
  */
-@HookAnnotation
 public class SQLResultSetHook extends AbstractSqlHook {
 
     /**
@@ -146,17 +142,9 @@ public class SQLResultSetHook extends AbstractSqlHook {
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             ResultSet resultSet = (ResultSet) sqlResultSet;
-            if (resultSet.isLast()) {
-                int queryCount = resultSet.getRow();
-                params.put("query_count", queryCount);
-                params.put("server", server);
-                int rows = resultSet.getMetaData().getColumnCount();
-                Map rowData = new HashMap();
-                for (int i = 1; i <= rows; i++) {
-                    rowData.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
-                }
-                params.put("result", rowData.toString());
-            }
+            int queryCount = resultSet.getRow();
+            params.put("query_count", queryCount);
+            params.put("server", server);
         } catch (Exception e) {
             e.printStackTrace();
         }

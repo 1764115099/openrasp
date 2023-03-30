@@ -55,7 +55,7 @@ public class JS {
     public static final Logger LOGGER = Logger.getLogger("com.iie.rasp.plugin.js.log");
     public static Object watchId = null;
 
-    private static String pluginConfig = "global.checkPoints=['command','directory','fileUpload','readFile','request','requestEnd','sql','sql_exception','sqlSlowQuery','sqlResult','hbaseSqlResult','writeFile','xxe','ognl','deserialization','reflection','webdav','ssrf','include','eval','copy','rename','loadLibrary','ssrfRedirect','deleteFile','mongodb','response','link','jndi','dns'];";
+    private static String pluginConfig = "global.checkPoints=['command','directory','fileUpload','readFile','request','requestEnd','sql','sql_exception','sqlResult','hbaseSqlResult','writeFile','xxe','ognl','deserialization','reflection','webdav','ssrf','include','eval','copy','rename','loadLibrary','ssrfRedirect','deleteFile','mongodb','response','link','jndi','dns'];";
 
     static {
         Base64Support.enable();

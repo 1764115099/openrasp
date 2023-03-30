@@ -18,25 +18,14 @@ package com.baidu.openrasp.hook.sql;
 
 import com.baidu.openrasp.HookHandler;
 import com.baidu.openrasp.hook.AbstractClassHook;
-import com.baidu.openrasp.messaging.LogTool;
 import com.baidu.openrasp.plugin.checker.CheckParameter;
-import com.baidu.openrasp.tool.Reflection;
 import com.baidu.openrasp.tool.annotation.HookAnnotation;
-import com.google.gson.Gson;
 import javassist.*;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.Table;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.LogLog;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.sql.ResultSet;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * @description: Hbase 查询Hook点
@@ -73,7 +62,6 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             LOGGER.debug("----------- hook CompleteScanResultCache");
             return true;
         }
-
 
         return false;
     }
