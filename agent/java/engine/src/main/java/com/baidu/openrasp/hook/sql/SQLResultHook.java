@@ -145,7 +145,7 @@ public class SQLResultHook extends AbstractSqlHook {
             for (int i=1;i<=rows;i++){
                 rowData.put(resultSet.getMetaData().getColumnName(i),resultSet.getObject(i));
             }
-            params.put("result", rowData.toString());
+            params.put("sql_result", rowData.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
