@@ -46,7 +46,7 @@ public class KeepAlive extends CloudTimerTask {
     private DependencyReport dependencyReport = new DependencyReport();
 
     public KeepAlive() {
-        super("OpenRASP Heartbeat Thread");
+        super("RASP Heartbeat Thread");
         if (Config.getConfig().isDependencyCheckEnable()) {
             dependencyReport.start();
         }

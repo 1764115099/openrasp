@@ -45,7 +45,7 @@ import java.util.List;
  */
 @HookAnnotation
 public class HbaseSQLResultHook extends AbstractClassHook {
-    private static final Logger LOGGER = Logger.getLogger(HbaseSQLResultHook.class.getName());
+    private static final Logger LOGGER = Logger.getLogger("com.iie.rasp.hook.sql.HbaseSQLResultHook");
     private static final String SQL_TYPE_HBASE = "hbase";
     private String className;
     private String type;
@@ -58,12 +58,11 @@ public class HbaseSQLResultHook extends AbstractClassHook {
      */
     @Override
     public boolean isClassMatched(String className) {
-        LOGGER.info("######### hook class: "+ className);
         if ("org/apache/hadoop/hbase/client/HTable".equals(className)) {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
             this.resultType = "Result";
-            LOGGER.info("----------- hook HTable");
+            LOGGER.debug("----------- hook HTable");
             return true;
         }
 
@@ -71,7 +70,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
             this.resultType = "ResultScanner";
-            LOGGER.info("----------- hook CompleteScanResultCache");
+            LOGGER.debug("----------- hook CompleteScanResultCache");
             return true;
         }
 
@@ -87,14 +86,14 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     @Override
     protected void hookMethod(CtClass ctClass) throws IOException, CannotCompileException, NotFoundException {
         if (this.resultType.equals("ResultScanner")) {
-            LOGGER.info("--------- in hbaseResultScanner Hook");
+            LOGGER.debug("--------- in hbaseResultScanner Hook");
             CtMethod loadResultsToCacheMethod=null;
             CtMethod addAndGetMethod=null;
             //Hbase1.x为loadResultsToCache方法
             try {
                 loadResultsToCacheMethod = ctClass.getDeclaredMethod("loadResultsToCache");
             }catch (NotFoundException e){
-                LOGGER.info("--------- in hbaseResultScanner 不存在 loadResultsToCacheMethod 方法，应该为Hbase2！");
+                LOGGER.debug("--------- in hbaseResultScanner 不存在 loadResultsToCacheMethod 方法，应该为Hbase2！");
             }
             if(loadResultsToCacheMethod != null){
                 String getScannerResultCacheMethodDesc1 = "([Lorg/apache/hadoop/hbase/client/Result;Z)V";
@@ -107,7 +106,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             try {
                 addAndGetMethod = ctClass.getDeclaredMethod("addAndGet");
             }catch (NotFoundException e){
-                LOGGER.info("--------- in hbaseResultScanner 不存在 addAndGetMethod 方法，应该为Hbase1！");
+                LOGGER.debug("--------- in hbaseResultScanner 不存在 addAndGetMethod 方法，应该为Hbase1！");
             }
             if(addAndGetMethod != null){
                 String getScannerResultCacheMethodDesc2 = "([Lorg/apache/hadoop/hbase/client/Result;Z)[Lorg/apache/hadoop/hbase/client/Result;";
@@ -126,7 +125,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     }
 
     public static void getSqlResult(String server, Object[] results) {
-        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,server= " + server + "result= " + results[0].toString());
+        LOGGER.debug("--------------in HbaseSQLResultHook getSqlResult,server= " + server + "result= " + results[0].toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             params.put("server", server);
@@ -138,7 +137,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     }
 
     public static void checkSqlResult(String server, Object result) {
-        LOGGER.info("--------------in HbaseSQLResultHook checkSqlResult,server= " + server + ", scannerResult: " + result.toString());
+        LOGGER.debug("--------------in HbaseSQLResultHook checkSqlResult,server= " + server + ", scannerResult: " + result.toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             params.put("server", server);
