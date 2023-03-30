@@ -126,7 +126,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     }
 
     public static void getSqlResult(String server, Object[] results) {
-        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,server= "+server);
+        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult,server= " + server + "result= " + results[0].toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             params.put("server", server);
@@ -137,29 +137,12 @@ public class HbaseSQLResultHook extends AbstractClassHook {
         HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
     }
 
-    public static void checkSqlResult(String server, Object scannerResult) {
-        LOGGER.info("--------------in HbaseSQLResultHook checkSqlResult,server= "+server+"scannerResult: "+scannerResult.toString());
+    public static void checkSqlResult(String server, Object result) {
+        LOGGER.info("--------------in HbaseSQLResultHook checkSqlResult,server= " + server + ", scannerResult: " + result.toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
-            Result r = (Result) scannerResult;
-            HashMap<String, String> result = new HashMap<String, String>();
-
-            List<Cell> cells = r.listCells();
-            // 遍历 KeyValue 实例
-            for (Cell cell : cells) {
-                // 获取列限定符
-                byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
-                String qualifier = Bytes.toString(qualifierBytes);
-
-                // 获取值
-                byte[] valueBytes = CellUtil.cloneValue(cell);
-                String value = Bytes.toString(valueBytes);
-
-                result.put(qualifier, value);
-            }
             params.put("server", server);
-            params.put("result", result);
-            LOGGER.info("----------in checkSqlResult,result: "+result);
+            params.put("result", result.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
