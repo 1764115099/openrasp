@@ -137,15 +137,17 @@ public class SQLResultHook extends AbstractSqlHook {
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             ResultSet resultSet = (ResultSet) sqlResultSet;
-            int queryCount = resultSet.getRow();
-            params.put("querycount", queryCount);
-            params.put("server", server);
-            int rows = resultSet.getMetaData().getColumnCount();
-            HashMap<String, Object> rowData = new HashMap<String, Object>();
-            for (int i=1;i<=rows;i++){
-                rowData.put(resultSet.getMetaData().getColumnName(i),resultSet.getObject(i));
+            if (resultSet.isLast()) {
+                int queryCount = resultSet.getRow();
+                params.put("querycount", queryCount);
+                params.put("server", server);
+                int rows = resultSet.getMetaData().getColumnCount();
+                HashMap<String, Object> rowData = new HashMap<String, Object>();
+                for (int i = 1; i <= rows; i++) {
+                    rowData.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
+                }
+                params.put("sqlresult", rowData.toString());
             }
-            params.put("sqlresult", rowData.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
