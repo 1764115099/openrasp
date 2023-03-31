@@ -148,7 +148,7 @@ public class SQLResultHook extends AbstractSqlHook {
                 }
                 params.put("sqlresult", rowData.toString());
             }
-            params.put("sqlresult", "ignore");
+            params.put("sqlresult", "iieIgnore");
         } catch (Exception e) {
             e.printStackTrace();
         }
