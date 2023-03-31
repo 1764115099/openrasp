@@ -139,7 +139,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             }
 
             params.put("server", server);
-            params.put("result", results);
+            params.put("result", results.toString());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -168,7 +168,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             }
 
             params.put("server", server);
-            params.put("result", results);
+            params.put("result", results.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
