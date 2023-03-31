@@ -121,25 +121,27 @@ public class HbaseSQLResultHook extends AbstractClassHook {
         LOGGER.debug("--------------in HbaseSQLResultHook getSqlResult,server= " + server + "result= " + hookResults[0].toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
-            Result result = (Result) hookResults[0];
-            List<Cell> cells = result.listCells();
-            HashMap<String, String> results = new HashMap<String, String>();
+            if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
+                Result result = (Result) hookResults[0];
+                List<Cell> cells = result.listCells();
+                HashMap<String, String> results = new HashMap<String, String>();
 
-            // 遍历 KeyValue 实例
-            for (Cell cell : cells) {
-                // 获取列限定符
-                byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
-                String qualifier = Bytes.toString(qualifierBytes);
+                // 遍历 KeyValue 实例
+                for (Cell cell : cells) {
+                    // 获取列限定符
+                    byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
+                    String qualifier = Bytes.toString(qualifierBytes);
 
-                // 获取值
-                byte[] valueBytes = CellUtil.cloneValue(cell);
-                String value = Bytes.toString(valueBytes);
+                    // 获取值
+                    byte[] valueBytes = CellUtil.cloneValue(cell);
+                    String value = Bytes.toString(valueBytes);
 
-                results.put(qualifier,value);
+                    results.put(qualifier,value);
+                }
+
+                params.put("server", server);
+                params.put("result", results.toString());
             }
-
-            params.put("server", server);
-            params.put("result", results.toString());
         }catch (Exception e){
             e.printStackTrace();
         }
