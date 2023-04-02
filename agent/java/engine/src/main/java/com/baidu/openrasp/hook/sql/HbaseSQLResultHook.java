@@ -97,17 +97,17 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             }
 
             //Hbase2.x为addAndGet方法
-            try {
-                addAndGetMethod = ctClass.getDeclaredMethod("addAndGet");
-            }catch (NotFoundException e){
-                LOGGER.info("--------- in hbaseResultScanner 不存在 addAndGetMethod 方法，应该为Hbase1！");
-            }
-            if(addAndGetMethod != null){
-                String getScannerResultCacheMethodDesc2 = "([Lorg/apache/hadoop/hbase/client/Result;Z)[Lorg/apache/hadoop/hbase/client/Result;";
-                String getScannerSrc2 = getInvokeStaticSrc(HbaseSQLResultHook.class, "getSqlResult2",
-                        "\"" + type + "\"" + ",$1", String.class, Object.class, Object.class);
-                insertAfter(ctClass, "addAndGet", getScannerResultCacheMethodDesc2, getScannerSrc2);
-            }
+//            try {
+//                addAndGetMethod = ctClass.getDeclaredMethod("addAndGet");
+//            }catch (NotFoundException e){
+//                LOGGER.info("--------- in hbaseResultScanner 不存在 addAndGetMethod 方法，应该为Hbase1！");
+//            }
+//            if(addAndGetMethod != null){
+//                String getScannerResultCacheMethodDesc2 = "([Lorg/apache/hadoop/hbase/client/Result;Z)[Lorg/apache/hadoop/hbase/client/Result;";
+//                String getScannerSrc2 = getInvokeStaticSrc(HbaseSQLResultHook.class, "getSqlResult2",
+//                        "\"" + type + "\"" + ",$1", String.class, Object.class, Object.class);
+//                insertAfter(ctClass, "addAndGet", getScannerResultCacheMethodDesc2, getScannerSrc2);
+//            }
 
         }else if (this.resultType.equals("Result")){
             LogLog.debug("--------- in hbaseResult Hook");
