@@ -119,7 +119,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     }
 
     public static void getSqlResult(String server, Object[] hookResults) {
-        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, Hbase 1.x, server= " + server + "result= " + hookResults[0].toString());
+        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, server= " + server + "result= " + hookResults[0].toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
