@@ -97,17 +97,17 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             }
 
             //Hbase2.x为addAndGet方法
-//            try {
-//                addAndGetMethod = ctClass.getDeclaredMethod("addAndGet");
-//            }catch (NotFoundException e){
-//                LOGGER.info("--------- in hbaseResultScanner 不存在 addAndGetMethod 方法，应该为Hbase1！");
-//            }
-//            if(addAndGetMethod != null){
-//                String getScannerResultCacheMethodDesc2 = "([Lorg/apache/hadoop/hbase/client/Result;Z)[Lorg/apache/hadoop/hbase/client/Result;";
-//                String getScannerSrc2 = getInvokeStaticSrc(HbaseSQLResultHook.class, "getSqlResult2",
-//                        "\"" + type + "\"" + ",$1", String.class, Object.class, Object.class);
-//                insertAfter(ctClass, "addAndGet", getScannerResultCacheMethodDesc2, getScannerSrc2);
-//            }
+            try {
+                addAndGetMethod = ctClass.getDeclaredMethod("addAndGet");
+            }catch (NotFoundException e){
+                LOGGER.info("--------- in hbaseResultScanner 不存在 addAndGetMethod 方法，应该为Hbase1！");
+            }
+            if(addAndGetMethod != null){
+                String getScannerResultCacheMethodDesc2 = "([Lorg/apache/hadoop/hbase/client/Result;Z)[Lorg/apache/hadoop/hbase/client/Result;";
+                String getScannerSrc2 = getInvokeStaticSrc(HbaseSQLResultHook.class, "getSqlResult",
+                        "\"" + type + "\"" + ",$1", String.class, Object.class, Object.class);
+                insertAfter(ctClass, "addAndGet", getScannerResultCacheMethodDesc2, getScannerSrc2);
+            }
 
         }else if (this.resultType.equals("Result")){
             LogLog.debug("--------- in hbaseResult Hook");
@@ -123,58 +123,25 @@ public class HbaseSQLResultHook extends AbstractClassHook {
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
-                Result result = (Result) hookResults[0];
-                List<Cell> cells = result.listCells();
-                HashMap<String, String> results = new HashMap<String, String>();
-
-                // 遍历 KeyValue 实例
-                for (Cell cell : cells) {
-                    // 获取列限定符
-                    byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
-                    String qualifier = Bytes.toString(qualifierBytes);
-
-                    // 获取值
-                    byte[] valueBytes = CellUtil.cloneValue(cell);
-                    String value = Bytes.toString(valueBytes);
-
-                    results.put(qualifier,value);
-                }
-
-                params.put("server", server);
-                params.put("result", results.toString());
-            } else {
-                params.put("result", "iieIgnore");
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
-    }
-
-    public static void getSqlResult2(String server, Object[] hookResults) {
-        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, Hbase 2.x, server= " + server + "result= " + hookResults[0].toString());
-        HashMap<String, Object> params = new HashMap<String, Object>();
-        try {
-            if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
-                Result result = (Result) hookResults[0];
-                List<Cell> cells = result.listCells();
-                HashMap<String, String> results = new HashMap<String, String>();
-
-                // 遍历 KeyValue 实例
-                for (Cell cell : cells) {
-                    // 获取列限定符
-                    byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
-                    String qualifier = Bytes.toString(qualifierBytes);
-
-                    // 获取值
-                    byte[] valueBytes = CellUtil.cloneValue(cell);
-                    String value = Bytes.toString(valueBytes);
-
-                    results.put(qualifier,value);
-                }
+//                Result result = (Result) hookResults[0];
+//                List<Cell> cells = result.listCells();
+//                HashMap<String, String> results = new HashMap<String, String>();
+//
+//                // 遍历 KeyValue 实例
+//                for (Cell cell : cells) {
+//                    // 获取列限定符
+//                    byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
+//                    String qualifier = Bytes.toString(qualifierBytes);
+//
+//                    // 获取值
+//                    byte[] valueBytes = CellUtil.cloneValue(cell);
+//                    String value = Bytes.toString(valueBytes);
+//
+//                    results.put(qualifier,value);
+//                }
 
                 params.put("server", server);
-                params.put("result", results.toString());
+                params.put("result", hookResults[0].toString());
             } else {
                 params.put("result", "iieIgnore");
             }
