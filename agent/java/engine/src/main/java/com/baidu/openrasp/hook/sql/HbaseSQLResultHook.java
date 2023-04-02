@@ -141,7 +141,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
                 }
 
                 params.put("server", server);
-                params.put("result", hookResults[0].toString());
+                params.put("result", results.toString());
             } else {
                 params.put("result", "iieIgnore");
             }
