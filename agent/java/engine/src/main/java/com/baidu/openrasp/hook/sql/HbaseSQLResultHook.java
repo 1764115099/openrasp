@@ -52,7 +52,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
      */
     @Override
     public boolean isClassMatched(String className) {
-        LOGGER.info("########### in isClassMatched Hook className: "+className);
+        LOGGER.debug("########### in isClassMatched Hook className: "+className);
         if ("org/apache/hadoop/hbase/client/HTable".equals(className)) {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
@@ -80,14 +80,14 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     @Override
     protected void hookMethod(CtClass ctClass) throws IOException, CannotCompileException, NotFoundException {
         if (this.resultType.equals("ResultScanner")) {
-            LOGGER.info("--------- in hbaseResultScanner Hook");
+            LOGGER.debug("--------- in hbaseResultScanner Hook");
             CtMethod loadResultsToCacheMethod=null;
             CtMethod addAndGetMethod=null;
             //Hbase1.x为loadResultsToCache方法
             try {
                 loadResultsToCacheMethod = ctClass.getDeclaredMethod("loadResultsToCache");
             }catch (NotFoundException e){
-                LOGGER.info("--------- in hbaseResultScanner 不存在 loadResultsToCacheMethod 方法，应该为Hbase2！");
+                LOGGER.debug("--------- in hbaseResultScanner 不存在 loadResultsToCacheMethod 方法，应该为Hbase2！");
             }
             if(loadResultsToCacheMethod != null){
                 String getScannerResultCacheMethodDesc1 = "([Lorg/apache/hadoop/hbase/client/Result;Z)V";
@@ -100,17 +100,17 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             try {
                 addAndGetMethod = ctClass.getDeclaredMethod("addAndGet");
             }catch (NotFoundException e){
-                LOGGER.info("--------- in hbaseResultScanner 不存在 addAndGetMethod 方法，应该为Hbase1！");
+                LOGGER.debug("--------- in hbaseResultScanner 不存在 addAndGetMethod 方法，应该为Hbase1！");
             }
             if(addAndGetMethod != null){
                 String getScannerResultCacheMethodDesc2 = "([Lorg/apache/hadoop/hbase/client/Result;Z)[Lorg/apache/hadoop/hbase/client/Result;";
-                String getScannerSrc2 = getInvokeStaticSrc(HbaseSQLResultHook.class, "getSqlResult2",
+                String getScannerSrc2 = getInvokeStaticSrc(HbaseSQLResultHook.class, "getSqlResult",
                         "\"" + type + "\"" + ",$1", String.class, Object.class, Object.class);
                 insertAfter(ctClass, "addAndGet", getScannerResultCacheMethodDesc2, getScannerSrc2);
             }
 
         }else if (this.resultType.equals("Result")){
-            LogLog.debug("--------- in hbaseResult Hook");
+            LOGGER.debug("--------- in hbaseResult Hook");
             String getMethodDesc = "(Lorg/apache/hadoop/hbase/client/Get;)Lorg/apache/hadoop/hbase/client/Result;";
             String getSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlResult",
                     "\"" + type + "\"" + ",$_", String.class, Object.class);
@@ -119,7 +119,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     }
 
     public static void getSqlResult(String server, Object[] hookResults) {
-        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, Hbase 1.x, server= " + server + "result= " + hookResults[0].toString());
+        LOGGER.debug("--------------in HbaseSQLResultHook getSqlResult, Hbase 1.x, server= " + server + "result= " + hookResults[0].toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
@@ -151,24 +151,8 @@ public class HbaseSQLResultHook extends AbstractClassHook {
         HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
     }
 
-    public static void getSqlResult2(String server, Object[] hookResults) {
-        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, Hbase 2.x, server= " + server + "result= " + hookResults[0].toString());
-        HashMap<String, Object> params = new HashMap<String, Object>();
-        try {
-            if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
-                params.put("server", server);
-                params.put("result", hookResults[0].toString());
-            } else {
-                params.put("result", "iieIgnore");
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
-    }
-
     public static void checkSqlResult(String server, Object hookResult) {
-        LOGGER.info("--------------in HbaseSQLResultHook checkSqlResult,server= " + server + ", scannerResult: " + hookResult.toString());
+        LOGGER.debug("--------------in HbaseSQLResultHook checkSqlResult,server= " + server + ", scannerResult: " + hookResult.toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             Result result = (Result) hookResult;
