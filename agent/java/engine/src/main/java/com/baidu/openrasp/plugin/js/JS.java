@@ -51,11 +51,11 @@ import java.util.List;
 import java.util.Map;
 
 public class JS {
-    public static final Logger PLUGIN_LOGGER = Logger.getLogger(JS.class.getPackage().getName() + ".log");
-    public static final Logger LOGGER = Logger.getLogger(JS.class.getPackage().getName());
+    public static final Logger PLUGIN_LOGGER = Logger.getLogger("com.iie.rasp.plugin.js.log");
+    public static final Logger LOGGER = Logger.getLogger("com.iie.rasp.plugin.js.log");
     public static Object watchId = null;
 
-    private static String pluginConfig = "global.checkPoints=['command','directory','fileUpload','readFile','request','requestEnd','sql','sql_exception','sqlSlowQuery','sqlResult',writeFile','xxe','ognl','deserialization','reflection','webdav','ssrf','include','eval','copy','rename','loadLibrary','ssrfRedirect','deleteFile','mongodb','response','link','jndi','dns'];";
+    private static String pluginConfig = "global.checkPoints=['command','directory','fileUpload','readFile','request','requestEnd','sql','sql_exception','sqlResult','hbaseSqlResult','writeFile','xxe','ognl','deserialization','reflection','webdav','ssrf','include','eval','copy','rename','loadLibrary','ssrfRedirect','deleteFile','mongodb','response','link','jndi','dns'];";
 
     static {
         Base64Support.enable();

@@ -22,13 +22,11 @@ import com.baidu.openrasp.tool.annotation.HookAnnotation;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.NotFoundException;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by ldx on 22-10-20.
@@ -36,6 +34,7 @@ import java.util.Map;
  */
 @HookAnnotation
 public class SQLResultHook extends AbstractSqlHook {
+    private static final Logger LOGGER = Logger.getLogger(SQLResultHook.class.getName());
 
     @Override
     public boolean isClassMatched(String className) {
@@ -44,6 +43,7 @@ public class SQLResultHook extends AbstractSqlHook {
                 || "com/mysql/cj/jdbc/result/ResultSetImpl".equals(className)) {
             this.type = SqlType.MYSQL;
             this.exceptions = new String[]{"java/sql/SQLException"};
+            LOGGER.debug("----- hook msyql: "+ className);
             return true;
         }
 
@@ -110,7 +110,7 @@ public class SQLResultHook extends AbstractSqlHook {
                     }
                 }
             }
-        } else {
+        }else {
             hookSqlResultMethod(ctClass);
         }
     }
@@ -121,6 +121,7 @@ public class SQLResultHook extends AbstractSqlHook {
      * @param ctClass sql 检测结果类
      */
     private void hookSqlResultMethod(CtClass ctClass) throws NotFoundException, CannotCompileException {
+        LOGGER.debug("--------- in hookSqlResultMethod Hook");
         String src = getInvokeStaticSrc(SQLResultHook.class, "checkSqlResult",
                 "\"" + type.name + "\"" + ",$0", String.class, Object.class);
         insertBefore(ctClass, "next", "()Z", src);
@@ -132,25 +133,26 @@ public class SQLResultHook extends AbstractSqlHook {
      * @param sqlResultSet 数据库查询结果
      */
     public static void checkSqlResult(String server, Object sqlResultSet) {
+        LOGGER.debug("----------in SQLResultHook checkSqlResult,result: "+sqlResultSet.toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             ResultSet resultSet = (ResultSet) sqlResultSet;
-            int queryCount = resultSet.getRow();
-            params.put("query_count", queryCount);
-            params.put("server", server);
-
-            int rows = resultSet.getMetaData().getColumnCount();
-            Map rowData = new HashMap();
-            for (int i=1;i<=rows;i++){
-                rowData.put(resultSet.getMetaData().getColumnName(i),resultSet.getObject(i));
+            if (resultSet.isLast()) {
+                int queryCount = resultSet.getRow();
+                params.put("querycount", queryCount);
+                params.put("server", server);
+                int rows = resultSet.getMetaData().getColumnCount();
+                HashMap<String, Object> rowData = new HashMap<String, Object>();
+                for (int i = 1; i <= rows; i++) {
+                    rowData.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
+                }
+                params.put("sqlresult", rowData.toString());
+            } else {
+                params.put("sqlresult", "iieIgnore");
             }
-            params.put("result", rowData.toString());
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         HookHandler.doCheck(CheckParameter.Type.SQLResult, params);
     }
-
 }

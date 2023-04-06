@@ -39,6 +39,7 @@ import java.util.Set;
 public abstract class AbstractSqlHook extends AbstractClassHook {
 
     public enum SqlType {
+        HBASE("hbase"),
         MYSQL("mysql"),
         SQLITE("sqlite"),
         ORACLE("oracle"),
