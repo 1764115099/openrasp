@@ -21,16 +21,10 @@ import com.baidu.openrasp.hook.AbstractClassHook;
 import com.baidu.openrasp.plugin.checker.CheckParameter;
 import com.baidu.openrasp.tool.annotation.HookAnnotation;
 import javassist.*;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
-import org.apache.log4j.helpers.LogLog;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * @description: Hbase 查询Hook点
@@ -123,25 +117,8 @@ public class HbaseSQLResultHook extends AbstractClassHook {
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
-                Result result = (Result) hookResults[0];
-                List<Cell> cells = result.listCells();
-                HashMap<String, String> results = new HashMap<String, String>();
-
-                // 遍历 KeyValue 实例
-                for (Cell cell : cells) {
-                    // 获取列限定符
-                    byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
-                    String qualifier = Bytes.toString(qualifierBytes);
-
-                    // 获取值
-                    byte[] valueBytes = CellUtil.cloneValue(cell);
-                    String value = Bytes.toString(valueBytes);
-
-                    results.put(qualifier,value);
-                }
-
                 params.put("server", server);
-                params.put("result", results.toString());
+                params.put("result", hookResults[0].toString());
             } else {
                 params.put("result", "iieIgnore");
             }
@@ -155,25 +132,8 @@ public class HbaseSQLResultHook extends AbstractClassHook {
         LOGGER.debug("--------------in HbaseSQLResultHook checkSqlResult,server= " + server + ", scannerResult: " + hookResult.toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
-            Result result = (Result) hookResult;
-            List<Cell> cells = result.listCells();
-            HashMap<String, String> results = new HashMap<String, String>();
-
-            // 遍历 KeyValue 实例
-            for (Cell cell : cells) {
-                // 获取列限定符
-                byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
-                String qualifier = Bytes.toString(qualifierBytes);
-
-                // 获取值
-                byte[] valueBytes = CellUtil.cloneValue(cell);
-                String value = Bytes.toString(valueBytes);
-
-                results.put(qualifier,value);
-            }
-
             params.put("server", server);
-            params.put("result", results.toString());
+            params.put("result", hookResult.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
