@@ -52,7 +52,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
      */
     @Override
     public boolean isClassMatched(String className) {
-        LOGGER.debug("########### in isClassMatched Hook className: "+className);
+        LOGGER.info("########### in isClassMatched Hook className: "+className);
         if ("org/apache/hadoop/hbase/client/HTable".equals(className)) {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
@@ -65,7 +65,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             this.type = SQL_TYPE_HBASE;
             this.className = className;
             this.resultType = "ResultScanner";
-            LOGGER.debug("----------- hook CompleteScanResultCache");
+            LOGGER.info("----------- hook CompleteScanResultCache");
             return true;
         }
 
@@ -80,14 +80,14 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     @Override
     protected void hookMethod(CtClass ctClass) throws IOException, CannotCompileException, NotFoundException {
         if (this.resultType.equals("ResultScanner")) {
-            LOGGER.debug("--------- in hbaseResultScanner Hook");
+            LOGGER.info("--------- in hbaseResultScanner Hook");
             CtMethod loadResultsToCacheMethod=null;
             CtMethod addAndGetMethod=null;
             //Hbase1.x为loadResultsToCache方法
             try {
                 loadResultsToCacheMethod = ctClass.getDeclaredMethod("loadResultsToCache");
             }catch (NotFoundException e){
-                LOGGER.debug("--------- in hbaseResultScanner 不存在 loadResultsToCacheMethod 方法，应该为Hbase2！");
+                LOGGER.info("--------- in hbaseResultScanner 不存在 loadResultsToCacheMethod 方法，应该为Hbase2！");
             }
             if(loadResultsToCacheMethod != null){
                 String getScannerResultCacheMethodDesc1 = "([Lorg/apache/hadoop/hbase/client/Result;Z)V";
@@ -100,7 +100,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             try {
                 addAndGetMethod = ctClass.getDeclaredMethod("addAndGet");
             }catch (NotFoundException e){
-                LOGGER.debug("--------- in hbaseResultScanner 不存在 addAndGetMethod 方法，应该为Hbase1！");
+                LOGGER.info("--------- in hbaseResultScanner 不存在 addAndGetMethod 方法，应该为Hbase1！");
             }
             if(addAndGetMethod != null){
                 String getScannerResultCacheMethodDesc2 = "([Lorg/apache/hadoop/hbase/client/Result;Z)[Lorg/apache/hadoop/hbase/client/Result;";
@@ -110,7 +110,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             }
 
         }else if (this.resultType.equals("Result")){
-            LOGGER.debug("--------- in hbaseResult Hook");
+            LOGGER.info("--------- in hbaseResult Hook");
             String getMethodDesc = "(Lorg/apache/hadoop/hbase/client/Get;)Lorg/apache/hadoop/hbase/client/Result;";
             String getSrc = getInvokeStaticSrc(HbaseSQLResultHook.class, "checkSqlResult",
                     "\"" + type + "\"" + ",$_", String.class, Object.class);
@@ -119,7 +119,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     }
 
     public static void getSqlResult(String server, Object[] hookResults) {
-        LOGGER.debug("--------------in HbaseSQLResultHook getSqlResult, server= " + server + "result= " + hookResults[0].toString());
+        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, server= " + server + "result= " + hookResults[0].toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
@@ -139,7 +139,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
 
                     results.put(qualifier,value);
                 }
-
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, results= " + results);
                 params.put("server", server);
                 params.put("result", results.toString());
             } else {
@@ -152,7 +152,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     }
 
     public static void checkSqlResult(String server, Object hookResult) {
-        LOGGER.debug("--------------in HbaseSQLResultHook checkSqlResult,server= " + server + ", scannerResult: " + hookResult.toString());
+        LOGGER.info("--------------in HbaseSQLResultHook checkSqlResult,server= " + server + ", scannerResult: " + hookResult.toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             Result result = (Result) hookResult;
