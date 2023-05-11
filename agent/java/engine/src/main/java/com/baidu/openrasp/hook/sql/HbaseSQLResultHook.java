@@ -145,11 +145,14 @@ public class HbaseSQLResultHook extends AbstractClassHook {
                 params.put("server", server);
                 params.put("result", results.toString());
             } else {
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieIgnore");
                 params.put("result", "iieIgnore");
             }
         }catch (Exception e){
+            LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, Exception= "+e.toString());
             e.printStackTrace();
         }
+        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, before doCheck ");
         HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
     }
 
