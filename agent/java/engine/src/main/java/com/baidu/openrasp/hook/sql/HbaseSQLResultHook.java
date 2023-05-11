@@ -119,14 +119,14 @@ public class HbaseSQLResultHook extends AbstractClassHook {
     }
 
     public static void getSqlResult(String server, Object[] hookResults) {
-        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, server= " + server + "result= " + hookResults[0].toString());
+        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, server= " + server + ", result= " + hookResults[0].toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
                 Result result = (Result) hookResults[0];
                 List<Cell> cells = result.listCells();
                 HashMap<String, String> results = new HashMap<String, String>();
-
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, hbresult= " + results + ", cells= " +cells);
                 // 遍历 KeyValue 实例
                 for (Cell cell : cells) {
                     // 获取列限定符
@@ -136,7 +136,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
                     // 获取值
                     byte[] valueBytes = CellUtil.cloneValue(cell);
                     String value = Bytes.toString(valueBytes);
-
+                    LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, qualifier= " + qualifier + ", value= " +value);
                     results.put(qualifier,value);
                 }
                 LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, results= " + results);
