@@ -20,11 +20,15 @@ import com.baidu.openrasp.HookHandler;
 import com.baidu.openrasp.hook.AbstractClassHook;
 import com.baidu.openrasp.plugin.checker.CheckParameter;
 import com.baidu.openrasp.tool.annotation.HookAnnotation;
+import com.iie.hadoop.hbase.Cell;
+import com.iie.hadoop.hbase.CellUtil;
+import com.iie.hadoop.hbase.client.Result;
+import com.iie.hadoop.hbase.util.Bytes;
 import javassist.*;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
+//import org.apache.hadoop.hbase.Cell;
+//import org.apache.hadoop.hbase.CellUtil;
+//import org.apache.hadoop.hbase.client.Result;
+//import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.LogLog;
 
@@ -152,7 +156,7 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, Exception= "+e.toString());
             e.printStackTrace();
         }
-        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, before doCheck ");
+        LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, before doCheck, params= "+params);
         HookHandler.doCheck(CheckParameter.Type.HbaseSQLResult, params);
     }
 
