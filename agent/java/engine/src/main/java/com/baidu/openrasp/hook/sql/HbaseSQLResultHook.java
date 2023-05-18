@@ -20,19 +20,7 @@ import com.baidu.openrasp.HookHandler;
 import com.baidu.openrasp.hook.AbstractClassHook;
 import com.baidu.openrasp.plugin.checker.CheckParameter;
 import com.baidu.openrasp.tool.annotation.HookAnnotation;
-//import com.iie.hadoop.hbase.Cell;
-//import com.iie.hadoop.hbase.CellUtil;
-//import com.iie.hadoop.hbase.client.Result;
-//import com.iie.hadoop.hbase.util.Bytes;
 import javassist.*;
-//import org.apache.hadoop.hbase.Cell;
-//import org.apache.hadoop.hbase.CellUtil;
-//import org.apache.hadoop.hbase.client.Result;
-//import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.LogLog;
 
@@ -133,19 +121,19 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, try... ");
             if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
                 LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, hbresult= " + hookResults[0]);
-                Result result = (Result) hookResults[0];
-                List<Cell> cells = result.listCells();
+                com.iie.hadoop.hbase.client.Result result = (com.iie.hadoop.hbase.client.Result) hookResults[0];
+                List<com.iie.hadoop.hbase.Cell> cells = result.listCells();
                 HashMap<String, String> results = new HashMap<String, String>();
                 LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, hbresult= " + results + ", cells= " +cells);
                 // 遍历 KeyValue 实例
-                for (Cell cell : cells) {
+                for (com.iie.hadoop.hbase.Cell cell : cells) {
                     // 获取列限定符
-                    byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
-                    String qualifier = Bytes.toString(qualifierBytes);
+                    byte[] qualifierBytes = com.iie.hadoop.hbase.CellUtil.cloneQualifier(cell);
+                    String qualifier = com.iie.hadoop.hbase.util.Bytes.toString(qualifierBytes);
 
                     // 获取值
-                    byte[] valueBytes = CellUtil.cloneValue(cell);
-                    String value = Bytes.toString(valueBytes);
+                    byte[] valueBytes = com.iie.hadoop.hbase.CellUtil.cloneValue(cell);
+                    String value = com.iie.hadoop.hbase.util.Bytes.toString(valueBytes);
                     LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, qualifier= " + qualifier + ", value= " +value);
                     results.put(qualifier,value);
                 }
@@ -168,19 +156,19 @@ public class HbaseSQLResultHook extends AbstractClassHook {
         LOGGER.info("--------------in HbaseSQLResultHook checkSqlResult,server= " + server + ", scannerResult: " + hookResult.toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
-            Result result = (Result) hookResult;
-            List<Cell> cells = result.listCells();
+            com.iie.hadoop.hbase.client.Result result = (com.iie.hadoop.hbase.client.Result) hookResult;
+            List<com.iie.hadoop.hbase.Cell> cells = result.listCells();
             HashMap<String, String> results = new HashMap<String, String>();
 
             // 遍历 KeyValue 实例
-            for (Cell cell : cells) {
+            for (com.iie.hadoop.hbase.Cell cell : cells) {
                 // 获取列限定符
-                byte[] qualifierBytes = CellUtil.cloneQualifier(cell);
-                String qualifier = Bytes.toString(qualifierBytes);
+                byte[] qualifierBytes = com.iie.hadoop.hbase.CellUtil.cloneQualifier(cell);
+                String qualifier = com.iie.hadoop.hbase.util.Bytes.toString(qualifierBytes);
 
                 // 获取值
-                byte[] valueBytes = CellUtil.cloneValue(cell);
-                String value = Bytes.toString(valueBytes);
+                byte[] valueBytes = com.iie.hadoop.hbase.CellUtil.cloneValue(cell);
+                String value = com.iie.hadoop.hbase.util.Bytes.toString(valueBytes);
 
                 results.put(qualifier,value);
             }

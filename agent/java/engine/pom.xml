@@ -107,14 +107,14 @@
             <artifactId>iie-hbase</artifactId>
             <version>1.7.2</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/iie-hbase-1.7.2.jar</systemPath>
+            <systemPath>${project.basedir}/iie-hbase.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.iie</groupId>
             <artifactId>iie-hbase-common</artifactId>
             <version>1.7.2</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/iie-hbase-common-1.7.2.jar</systemPath>
+            <systemPath>${project.basedir}/iie-hbase-common.jar</systemPath>
         </dependency>
 
     </dependencies>
