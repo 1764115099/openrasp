@@ -23,8 +23,12 @@ import com.baidu.openrasp.tool.annotation.HookAnnotation;
 import javassist.*;
 import org.apache.log4j.Logger;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @description: Hbase 查询Hook点
@@ -117,8 +121,52 @@ public class HbaseSQLResultHook extends AbstractClassHook {
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
+
+//              强制类型转换为Result
+                Class<?> iieResultClass = Class.forName("org.apache.hadoop.hbase.client.Result");
+                Object iieResultObj = iieResultClass.cast(hookResults[0]);
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieResultObj= " + iieResultObj.toString());
+
+//				获取Cells
+                Method iieListCellsMethod = iieResultClass.getMethod("listCells");
+                List<Object> iieListCells = (List<Object>) iieListCellsMethod.invoke(iieResultObj);
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieListCells= " + iieListCells.toString()+", cell1: "+iieListCells.get(0));
+
+//				将cell强制类型转换
+                Class<?> iieCellClass = Class.forName("org.apache.hadoop.hbase.Cell");
+                Object iieCellObj = iieCellClass.cast(iieListCells.get(0));
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieCellObj= " + iieCellObj.toString());
+
+//              获取value对象
+                Class<?> iieCellUtilClass = Class.forName("org.apache.hadoop.hbase.CellUtil");
+                Method iieCloneValueMethod = iieCellUtilClass.getMethod("cloneValue", iieCellClass);
+                Object iieValue = iieCloneValueMethod.invoke(iieCellUtilClass, iieCellObj);
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieValue= " + iieValue.toString());
+
+//				转换成byte[]
+                // 创建字节输出流和对象输出流
+                ByteArrayOutputStream iieByteOut = new ByteArrayOutputStream();
+                ObjectOutputStream iieObjOut = new ObjectOutputStream(iieByteOut);
+
+                // 将对象写入对象输出流
+                iieObjOut.writeObject(iieValue);
+                iieObjOut.flush();
+
+                // 获取字节数组
+                byte[] iieByteArray = iieByteOut.toByteArray();
+
+                // 关闭流
+                iieObjOut.close();
+                iieByteOut.close();
+
+//              字节转换方法
+				Class<?> iieBytesClass = Class.forName("org.apache.hadoop.hbase.util.Bytes");
+				Method iieToString = iieBytesClass.getMethod("toString",byte[].class);
+				Object iieHbaseResult = iieToString.invoke(iieBytesClass, iieByteArray);
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieHbaseResult= " + iieHbaseResult.toString());
                 params.put("server", server);
                 params.put("result", hookResults[0].toString());
+                params.put("resultValue", iieHbaseResult.toString());
             } else {
                 params.put("result", "iieIgnore");
             }
