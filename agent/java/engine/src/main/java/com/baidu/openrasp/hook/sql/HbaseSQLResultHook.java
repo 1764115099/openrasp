@@ -123,23 +123,30 @@ public class HbaseSQLResultHook extends AbstractClassHook {
             if(!hookResults[0].toString().contains("info:seqnumDuringOpen")){
                 LOGGER.info("--------------suitable result...");
 //              强制类型转换为Result
-                Class<?> iieResultClass = Class.forName("org.apache.hadoop.hbase.client.Result");
+                Class iieResultClass = Thread.currentThread().getContextClassLoader().loadClass("org.apache.hadoop.hbase.client.Result");
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieResultClass= " + iieResultClass.toString());
                 Object iieResultObj = iieResultClass.cast(hookResults[0]);
                 LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieResultObj= " + iieResultObj.toString());
 
 //				获取Cells
-                Method iieListCellsMethod = iieResultClass.getMethod("listCells");
+                Method iieListCellsMethod = iieResultClass.getDeclaredMethod("listCells");
+                iieListCellsMethod.setAccessible(true);
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieListCellsMethod= " + iieListCellsMethod.toString());
                 List<Object> iieListCells = (List<Object>) iieListCellsMethod.invoke(iieResultObj);
                 LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieListCells= " + iieListCells.toString()+", cell1: "+iieListCells.get(0));
 
 //				将cell强制类型转换
-                Class<?> iieCellClass = Class.forName("org.apache.hadoop.hbase.Cell");
+                Class iieCellClass = Thread.currentThread().getContextClassLoader().loadClass("org.apache.hadoop.hbase.Cell");
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieCellClass= " + iieCellClass.toString());
                 Object iieCellObj = iieCellClass.cast(iieListCells.get(0));
                 LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieCellObj= " + iieCellObj.toString());
 
 //              获取value对象
-                Class<?> iieCellUtilClass = Class.forName("org.apache.hadoop.hbase.CellUtil");
-                Method iieCloneValueMethod = iieCellUtilClass.getMethod("cloneValue", iieCellClass);
+                Class iieCellUtilClass = Thread.currentThread().getContextClassLoader().loadClass("org.apache.hadoop.hbase.CellUtil");
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieCellUtilClass= " + iieCellUtilClass.toString());
+                Method iieCloneValueMethod = iieCellUtilClass.getDeclaredMethod("cloneValue", iieCellClass);
+                iieCloneValueMethod.setAccessible(true);
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieCloneValueMethod= " + iieCloneValueMethod.toString());
                 Object iieValue = iieCloneValueMethod.invoke(iieCellUtilClass, iieCellObj);
                 LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieValue= " + iieValue.toString());
 
@@ -160,8 +167,10 @@ public class HbaseSQLResultHook extends AbstractClassHook {
                 iieByteOut.close();
 
 //              字节转换方法
-				Class<?> iieBytesClass = Class.forName("org.apache.hadoop.hbase.util.Bytes");
-				Method iieToString = iieBytesClass.getMethod("toString",byte[].class);
+				Class iieBytesClass = Thread.currentThread().getContextClassLoader().loadClass("org.apache.hadoop.hbase.util.Bytes");
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieBytesClass= " + iieBytesClass.toString());
+				Method iieToString = iieBytesClass.getDeclaredMethod("toString",byte[].class);
+                LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieToString= " + iieToString.toString());
 				Object iieHbaseResult = iieToString.invoke(iieBytesClass, iieByteArray);
                 LOGGER.info("--------------in HbaseSQLResultHook getSqlResult, iieHbaseResult= " + iieHbaseResult.toString());
                 params.put("server", server);
