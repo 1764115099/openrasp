@@ -48,45 +48,49 @@ public class SQLResultHook extends AbstractSqlHook {
         }
 
         /* SQLite */
-        if ("org/sqlite/RS".equals(className)
-                || "org/sqlite/jdbc3/JDBC3ResultSet".equals(className)) {
-            this.type = SqlType.SQLITE;
-            this.exceptions = new String[]{"java/sql/SQLException"};
-            return true;
-        }
+//        if ("org/sqlite/RS".equals(className)
+//                || "org/sqlite/jdbc3/JDBC3ResultSet".equals(className)) {
+//            this.type = SqlType.SQLITE;
+//            this.exceptions = new String[]{"java/sql/SQLException"};
+//            return true;
+//        }
 
        /* Oracle */
-        if ("oracle/jdbc/driver/OracleResultSetImpl".equals(className)) {
+//        oracle 11-21
+        if ("oracle/jdbc/driver/OracleResultSetImpl".equals(className)
+                || "oracle/jdbc/driver/ScrollableResultSet".equals(className)
+                || "oracle/jdbc/driver/InsensitiveScrollableResultSet".equals(className)
+        ) {
             this.type = SqlType.ORACLE;
             this.exceptions = new String[]{"java/sql/SQLException"};
             return true;
         }
 
         /* SQL Server */
-        if ("com/microsoft/sqlserver/jdbc/SQLServerResultSet".equals(className)) {
-            this.type = SqlType.SQLSERVER;
-            this.exceptions = new String[]{"com/microsoft/sqlserver/jdbc/SQLServerException"};
-            return true;
-        }
+//        if ("com/microsoft/sqlserver/jdbc/SQLServerResultSet".equals(className)) {
+//            this.type = SqlType.SQLSERVER;
+//            this.exceptions = new String[]{"com/microsoft/sqlserver/jdbc/SQLServerException"};
+//            return true;
+//        }
 
         /* PostgreSQL */
-        if ("org/postgresql/jdbc/PgResultSet".equals(className)
-                || "org/postgresql/jdbc1/AbstractJdbc1ResultSet".equals(className)
-                || "org/postgresql/jdbc2/AbstractJdbc2ResultSet".equals(className)
-                || "org/postgresql/jdbc3/AbstractJdbc3ResultSet".equals(className)
-                || "org/postgresql/jdbc3g/AbstractJdbc3gResultSet".equals(className)
-                || "org/postgresql/jdbc4/AbstractJdbc4ResultSet".equals(className)) {
-            this.type = SqlType.PGSQL;
-            this.exceptions = new String[]{"java/sql/SQLException"};
-            return true;
-        }
+//        if ("org/postgresql/jdbc/PgResultSet".equals(className)
+//                || "org/postgresql/jdbc1/AbstractJdbc1ResultSet".equals(className)
+//                || "org/postgresql/jdbc2/AbstractJdbc2ResultSet".equals(className)
+//                || "org/postgresql/jdbc3/AbstractJdbc3ResultSet".equals(className)
+//                || "org/postgresql/jdbc3g/AbstractJdbc3gResultSet".equals(className)
+//                || "org/postgresql/jdbc4/AbstractJdbc4ResultSet".equals(className)) {
+//            this.type = SqlType.PGSQL;
+//            this.exceptions = new String[]{"java/sql/SQLException"};
+//            return true;
+//        }
 
         /* DB2 */
-        if (className.startsWith("com/ibm/db2/jcc/am")) {
-            this.type = SqlType.DB2;
-            this.exceptions = new String[]{"java/sql/SQLException"};
-            return true;
-        }
+//        if (className.startsWith("com/ibm/db2/jcc/am")) {
+//            this.type = SqlType.DB2;
+//            this.exceptions = new String[]{"java/sql/SQLException"};
+//            return true;
+//        }
 
         return false;
     }
@@ -133,7 +137,7 @@ public class SQLResultHook extends AbstractSqlHook {
      * @param sqlResultSet 数据库查询结果
      */
     public static void checkSqlResult(String server, Object sqlResultSet) {
-        LOGGER.debug("----------in SQLResultHook checkSqlResult,result: "+sqlResultSet.toString());
+        LOGGER.info("----------in SQLResultHook checkSqlResult,result: "+sqlResultSet.toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             ResultSet resultSet = (ResultSet) sqlResultSet;
@@ -154,6 +158,7 @@ public class SQLResultHook extends AbstractSqlHook {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        LOGGER.info("----------in SQLResultHook checkSqlResult,params: "+params.toString());
         HookHandler.doCheck(CheckParameter.Type.SQLResult, params);
     }
 }
