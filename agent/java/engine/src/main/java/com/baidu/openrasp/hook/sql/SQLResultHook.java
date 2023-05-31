@@ -57,14 +57,14 @@ public class SQLResultHook extends AbstractSqlHook {
 
        /* Oracle */
 //        oracle 11-21
-        if ("oracle/jdbc/driver/OracleResultSetImpl".equals(className)
-                || "oracle/jdbc/driver/ScrollableResultSet".equals(className)
-                || "oracle/jdbc/driver/InsensitiveScrollableResultSet".equals(className)
-        ) {
-            this.type = SqlType.ORACLE;
-            this.exceptions = new String[]{"java/sql/SQLException"};
-            return true;
-        }
+//        if ("oracle/jdbc/driver/OracleResultSetImpl".equals(className)
+//                || "oracle/jdbc/driver/ScrollableResultSet".equals(className)
+//                || "oracle/jdbc/driver/InsensitiveScrollableResultSet".equals(className)
+//        ) {
+//            this.type = SqlType.ORACLE;
+//            this.exceptions = new String[]{"java/sql/SQLException"};
+//            return true;
+//        }
 
         /* SQL Server */
 //        if ("com/microsoft/sqlserver/jdbc/SQLServerResultSet".equals(className)) {
@@ -137,7 +137,7 @@ public class SQLResultHook extends AbstractSqlHook {
      * @param sqlResultSet 数据库查询结果
      */
     public static void checkSqlResult(String server, Object sqlResultSet) {
-        LOGGER.info("----------in SQLResultHook checkSqlResult,result: "+sqlResultSet.toString());
+        LOGGER.debug("----------in SQLResultHook checkSqlResult,result: "+sqlResultSet.toString());
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
             ResultSet resultSet = (ResultSet) sqlResultSet;
@@ -158,7 +158,7 @@ public class SQLResultHook extends AbstractSqlHook {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        LOGGER.info("----------in SQLResultHook checkSqlResult,params: "+params.toString());
+        LOGGER.debug("----------in SQLResultHook checkSqlResult,params: "+params.toString());
         HookHandler.doCheck(CheckParameter.Type.SQLResult, params);
     }
 }
