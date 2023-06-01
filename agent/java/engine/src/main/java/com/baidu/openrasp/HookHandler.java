@@ -195,7 +195,10 @@ public class HookHandler {
             requestCache.set(requestContainer);
             responseCache.set(responseContainer);
             XXEHook.resetLocalExpandedSystemIds();
-            doCheck(CheckParameter.Type.REQUEST, EMPTY_MAP);
+            HashMap<String, String> params = new HashMap<String, String>();
+            params.put("requestId",requestCache.get().getRequestId().toString());
+            LOGGER.info("------------  request_id= " + requestCache.get().getRequestId() + ", params= " + params);
+            doCheck(CheckParameter.Type.REQUEST, params);
         }
     }
 

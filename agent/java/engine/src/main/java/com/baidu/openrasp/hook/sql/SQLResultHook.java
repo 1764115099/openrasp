@@ -37,13 +37,6 @@ import java.util.HashMap;
 public class SQLResultHook extends AbstractSqlHook {
     private static final Logger LOGGER = Logger.getLogger(SQLResultHook.class.getName());
 
-    public static ThreadLocal<AbstractRequest> requestCache = new ThreadLocal<AbstractRequest>() {
-        @Override
-        protected AbstractRequest initialValue() {
-            return null;
-        }
-    };
-
     @Override
     public boolean isClassMatched(String className) {
          /* MySQL */
@@ -165,7 +158,6 @@ public class SQLResultHook extends AbstractSqlHook {
                     rowData.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
                 }
                 params.put("sqlresult", rowData.toString());
-                params.put("requestId", requestCache.get().getRequestId());
                 LOGGER.info("-----------------  after rowData, params= "+params);
 //            } else {
 //                rowData.put("iieIgnore","iieIgnore");
