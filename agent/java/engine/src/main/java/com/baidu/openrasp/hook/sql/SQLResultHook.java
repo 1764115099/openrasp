@@ -18,6 +18,7 @@ package com.baidu.openrasp.hook.sql;
 
 import com.baidu.openrasp.HookHandler;
 import com.baidu.openrasp.plugin.checker.CheckParameter;
+import com.baidu.openrasp.request.AbstractRequest;
 import com.baidu.openrasp.tool.annotation.HookAnnotation;
 import javassist.CannotCompileException;
 import javassist.CtClass;
@@ -35,6 +36,13 @@ import java.util.HashMap;
 @HookAnnotation
 public class SQLResultHook extends AbstractSqlHook {
     private static final Logger LOGGER = Logger.getLogger(SQLResultHook.class.getName());
+
+    public static ThreadLocal<AbstractRequest> requestCache = new ThreadLocal<AbstractRequest>() {
+        @Override
+        protected AbstractRequest initialValue() {
+            return null;
+        }
+    };
 
     @Override
     public boolean isClassMatched(String className) {
@@ -157,6 +165,7 @@ public class SQLResultHook extends AbstractSqlHook {
                     rowData.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
                 }
                 params.put("sqlresult", rowData.toString());
+                params.put("requestId", requestCache.get().getRequestId());
                 LOGGER.info("-----------------  after rowData, params= "+params);
 //            } else {
 //                rowData.put("iieIgnore","iieIgnore");
