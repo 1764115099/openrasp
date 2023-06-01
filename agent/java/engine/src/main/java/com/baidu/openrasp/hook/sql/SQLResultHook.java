@@ -39,13 +39,13 @@ public class SQLResultHook extends AbstractSqlHook {
     @Override
     public boolean isClassMatched(String className) {
          /* MySQL */
-        if ("com/mysql/jdbc/ResultSetImpl".equals(className)
-                || "com/mysql/cj/jdbc/result/ResultSetImpl".equals(className)) {
-            this.type = SqlType.MYSQL;
-            this.exceptions = new String[]{"java/sql/SQLException"};
-            LOGGER.debug("----- hook msyql: "+ className);
-            return true;
-        }
+//        if ("com/mysql/jdbc/ResultSetImpl".equals(className)
+//                || "com/mysql/cj/jdbc/result/ResultSetImpl".equals(className)) {
+//            this.type = SqlType.MYSQL;
+//            this.exceptions = new String[]{"java/sql/SQLException"};
+//            LOGGER.debug("----- hook msyql: "+ className);
+//            return true;
+//        }
 
         /* SQLite */
 //        if ("org/sqlite/RS".equals(className)
@@ -63,6 +63,7 @@ public class SQLResultHook extends AbstractSqlHook {
         ) {
             this.type = SqlType.ORACLE;
             this.exceptions = new String[]{"java/sql/SQLException"};
+            LOGGER.info("----- hook oracle: "+ className);
             return true;
         }
 
@@ -137,24 +138,30 @@ public class SQLResultHook extends AbstractSqlHook {
      * @param sqlResultSet 数据库查询结果
      */
     public static void checkSqlResult(String server, Object sqlResultSet) {
-        LOGGER.info("----------in SQLResultHook checkSqlResult,result: "+sqlResultSet.toString());
+        LOGGER.info("----------in SQLResultHook checkSqlResult,result: "+sqlResultSet.toString()+", server: "+server);
         HashMap<String, Object> params = new HashMap<String, Object>();
         try {
+            LOGGER.info("-----------------  in try");
             ResultSet resultSet = (ResultSet) sqlResultSet;
             HashMap<String, Object> rowData = new HashMap<String, Object>();
-            if (resultSet.isLast()) {
+            LOGGER.info("-----------------  before queryCount");
+//            if (resultSet.isLast()) {
                 int queryCount = resultSet.getRow();
+                LOGGER.info("-----------------  after queryCount");
+
                 params.put("querycount", queryCount);
                 params.put("server", server);
+                LOGGER.info("-----------------  before rows, params= "+params);
                 int rows = resultSet.getMetaData().getColumnCount();
                 for (int i = 1; i <= rows; i++) {
                     rowData.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
                 }
                 params.put("sqlresult", rowData.toString());
-            } else {
-                rowData.put("iieIgnore","iieIgnore");
-                params.put("sqlresult", rowData.toString());
-            }
+                LOGGER.info("-----------------  after rowData, params= "+params);
+//            } else {
+//                rowData.put("iieIgnore","iieIgnore");
+//                params.put("sqlresult", rowData.toString());
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
